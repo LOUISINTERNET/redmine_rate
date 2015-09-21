@@ -13,6 +13,10 @@ ActionDispatch::Callbacks.to_prepare do
 
   require_dependency 'users_helper'
   UsersHelper.send(:include, RateUsersHelperPatch) unless UsersHelper.included_modules.include?(RateUsersHelperPatch)
+
+  require_dependency 'users_controller'
+  UsersController.send(:helper, :users)
+  UsersController.send(:helper, :rate)
 end
 
 # Hooks

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class RedmineRate::Hooks::PluginTimesheetViewsTimesheetGroupHeaderTest < ActionController::TestCase
   include Redmine::Hook::Helper
@@ -12,7 +12,7 @@ class RedmineRate::Hooks::PluginTimesheetViewsTimesheetGroupHeaderTest < ActionC
   def request
     @request ||= ActionController::TestRequest.new
   end
-  
+
   def hook(args={})
     call_hook :plugin_timesheet_views_timesheet_group_header, args
   end
@@ -20,7 +20,7 @@ class RedmineRate::Hooks::PluginTimesheetViewsTimesheetGroupHeaderTest < ActionC
   context "#plugin_timesheet_views_timesheet_group_header" do
     should "render the cost table header" do
       @response.body = hook
-      assert_select "th", :text => "Cost"
+      assert_select "th", text: "Cost"
     end
   end
 end

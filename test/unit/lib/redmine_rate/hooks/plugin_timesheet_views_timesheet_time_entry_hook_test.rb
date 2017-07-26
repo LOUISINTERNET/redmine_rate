@@ -1,7 +1,11 @@
-require File.dirname(__FILE__) + '/../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class RedmineRate::Hooks::PluginTimesheetViewsTimesheetTimeEntryTest < ActionController::TestCase
   include Redmine::Hook::Helper
+
+  def setup
+    TimeEntryActivity.generate!
+  end
 
   def controller
     @controller ||= ApplicationController.new
@@ -12,7 +16,7 @@ class RedmineRate::Hooks::PluginTimesheetViewsTimesheetTimeEntryTest < ActionCon
   def request
     @request ||= ActionController::TestRequest.new
   end
-  
+
   def hook(args={})
     call_hook :plugin_timesheet_views_timesheet_time_entry, args
   end
@@ -20,28 +24,28 @@ class RedmineRate::Hooks::PluginTimesheetViewsTimesheetTimeEntryTest < ActionCon
   context "#plugin_timesheet_views_timesheet_time_entry" do
     context "for users with view rate permission" do
       should "render a cost cell showing the cost for the time entry" do
-        User.current = User.generate!(:admin => true)
-        rate = Rate.generate!(:amount => 100)
-        time_entry = TimeEntry.generate!(:hours => 2, :rate => rate)
-        
-        @response.body = hook(:time_entry => time_entry)
+        User.current = User.generate! { |u| u.admin = true }
+        rate = Rate.generate!(amount: 100)
+        time_entry = TimeEntry.generate!(hours: 2, rate: rate)
 
-        assert_select 'td', :text => "$200.00"
-        
+        @response.body = hook(time_entry: time_entry)
+
+        assert_select 'td', text: "$200.00"
+
       end
     end
 
     context "for users without view rate permission" do
       should "render an empty cost cell" do
         User.current = nil
-        rate = Rate.generate!(:amount => 100)
-        time_entry = TimeEntry.generate!(:hours => 2, :rate => rate)
-        
-        @response.body = hook(:time_entry => time_entry)
+        rate = Rate.generate!(amount: 100)
+        time_entry = TimeEntry.generate!(hours: 2, rate: rate)
 
-        assert_select 'td', :text => '&nbsp;'
-        
+        @response.body = hook(time_entry: time_entry)
+
+        assert_select 'td', text: '&nbsp;'
+
       end
-    end    
+    end
   end
 end

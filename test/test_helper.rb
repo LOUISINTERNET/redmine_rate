@@ -1,31 +1,36 @@
-# Load the normal Rails helper
-require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
+require_relative "../../../test/test_helper"
+require_relative "../../../test/object_helpers"
+require_relative "object_helpers"
+require "capybara/rails"
 
-# Ensure that we are using the temporary fixture path
-Engines::Testing.set_fixture_path
+ActiveSupport::TestCase.fixture_path = File.dirname(__FILE__) + '/../../../test/fixtures'
 
-require "webrat"
-
-Webrat.configure do |config|
-  config.mode = :rails
+class ActiveSupport::TestCase
+  fixtures :users, :issues, :projects, :time_entries
 end
 
-module IntegrationTestHelper
+class RedmineRateIntegrationTest < Redmine::IntegrationTest
+  include Redmine::I18n
+  include Capybara::DSL
+
   def login_as(user="existing", password="existing")
     visit "/login"
-    fill_in 'Login', :with => user
-    fill_in 'Password', :with => password
-    click_button 'login'
-    assert_response :success
-    assert User.current.logged?
+
+    within("#login-form > form") do
+      fill_in "Login", with: user
+      fill_in "Password", with: password
+      find("input[type=submit]").click
+    end
+
+    assert_equal 200, page.status_code
+    assert_equal "/my/page", page.current_path
   end
 
   def logout
-    visit '/logout'
-    assert_response :success
-    assert !User.current.logged?
+    click_link l(:label_logout)
+    assert_equal 200, page.status_code
   end
-  
+
   def assert_forbidden
     assert_response :forbidden
     assert_template 'common/error'
@@ -35,9 +40,4 @@ module IntegrationTestHelper
     assert_response :success
     assert_template 'account/login'
   end
-  
-end
-
-class ActionController::IntegrationTest
-  include IntegrationTestHelper
 end

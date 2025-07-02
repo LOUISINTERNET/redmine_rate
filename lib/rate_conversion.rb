@@ -1,9 +1,9 @@
 class RateConversion
   RoundTo = 10
   
-  MemberRateDataFile = "#{RAILS_ROOT}/tmp/budget_member_rate_data.yml"
-  DeliverableDataFile = "#{RAILS_ROOT}/tmp/budget_deliverable_data.yml"
-  VendorInvoiceDataFile = "#{RAILS_ROOT}/tmp/billing_vendor_invoice_data.yml"
+  MemberRateDataFile = "#{Rails.root}/tmp/budget_member_rate_data.yml"
+  DeliverableDataFile = "#{Rails.root}/tmp/budget_deliverable_data.yml"
+  VendorInvoiceDataFile = "#{Rails.root}/tmp/billing_vendor_invoice_data.yml"
 
   
   def self.compare_values(pre, post, message)
